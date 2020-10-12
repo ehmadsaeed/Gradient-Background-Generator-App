@@ -1,23 +1,42 @@
+const root = document.documentElement;
 const h3 = document.querySelector('h3');
-const color1 = document.querySelector('.color1');
-const color2 = document.querySelector('.color2');
+const colorInput1 = document.querySelector('.color1');
+const colorInput2 = document.querySelector('.color2');
 const body = document.querySelector('#gradient');
-const random = document.querySelector('button');
+const button = document.querySelector('button');
 
-setGradient = () => {
-	body.style.background = _linearGradient();
-	random.style.background = _linearGradient();
-	h3.textContent = `${body.style.background}`;
+const defaultColors = {
+	color1: '#1488cc',
+	color2: '#2b32b2'
+}
+let newColors = {};
+
+/* Update CSS custom properties */
+setRootColors = ({color1, color2}) => {
+	root.style.setProperty('--color-1', color1);
+	root.style.setProperty('--color-2', color2);
+}
+
+/* Update input values */
+setInputValues = ({color1, color2}) => {
+	colorInput1.value = color1;
+	colorInput2.value = color2;
+}
+
+/* Display gradient value */
+displayGradient = () => {
+	h3.textContent = window.getComputedStyle(body).getPropertyValue('background-image');
+}
+
+/* Sets default colors */
+setInitialColors = (inputColors) => {
+	setRootColors(inputColors || defaultColors);
+	setInputValues(inputColors || defaultColors);
+	displayGradient();
 };
-_linearGradient = () => {
-	return 'linear-gradient(to right,' + color1.value + ', ' + color2.value + ' )';
-};
+setInitialColors();
 
-color1.addEventListener('input', setGradient);
-
-color2.addEventListener('input', setGradient);
-
-////Roshaan made these Changess
+/* Generate random hex color */
 randomColor = () => {
 	let letters = '0123456789ABCDEF';
 	let color = '#';
@@ -27,8 +46,23 @@ randomColor = () => {
 	return color;
 };
 
-random.addEventListener('click', () => {
-	color1.value = randomColor();
-	color2.value = randomColor();
-	setGradient();
+/* Get input change and update colors */
+inputChange = (event) => {
+	if (Object.keys(newColors).length === 0) {
+		newColors = { ...defaultColors };
+	}
+	newColors[event.target.name] = event.target.value;
+	setRootColors(newColors);
+}
+
+/* Event listeners */
+
+colorInput1.addEventListener('change', inputChange);
+
+colorInput2.addEventListener('change', inputChange);
+
+button.addEventListener('click', () => {
+	newColors.color1 = randomColor()
+	newColors.color2 = randomColor();
+	setInitialColors(newColors);
 });
